@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "All Purchased Tickets";
+    ViewData["PageNav"] = "Ticket";
+}
+@section Styles
+{
+    <!-- DataTables -->
+    <link rel="stylesheet" href="/adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.css">
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <a class="btn btn-outline-info float-right mb-3" asp-area="Customer" asp-controller="Ticket" asp-action="PlaceOrder">
+            <strong>Purchase Ticket<i class="fa fa-plus ml-2"></i></strong>
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">All Purchased Tickets</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table id="ticketPurchases" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Seat Number</th>
+                    <th>Bus Number</th>
+                    <th>Onboarding Time</th>
+                    <th style="min-width: 15%">Actions</th>
+                </tr>
+            </thead>
+
+            <tfoot>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Seat Number</th>
+                    <th>Bus Number</th>
+                    <th>Onboarding Time</th>
+                    <th>Actions</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <!-- /.card-body -->
+    <partial name="_ModalPartial" />
+</div>
+<!-- /.card -->
+
+@section Scripts
+{
+<!-- Data Tables -->
+<script src="/adminlte/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/adminlte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(function () {
+        $('#ticketPurchases').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/Customer/Ticket/GetPurchasedTickets",
+            },
+
+            "columnDefs": [
+                {
+                    "orderable": false,
+                    "targets": 4,
+                    "render": function (data, type, row) {
+                        return `<button type="submit" class="btn btn-info btn-sm" onclick="window.location.href='/Customer/Ticket/Edit/${data}'" value='${data}'>
+                                    <i class="fas fa-pencil-alt">
+                                    </i>
+                                    Edit
+                                </button>
+                                <button type="submit" class="btn btn-danger btn-sm show-bs-modal" data-id='${data}' value='${data}'>
+                                    <i class="fas fa-trash">
+                                    </i>
+                                    Delete
+                                </button>`;
+                    }
+                }
+            ]
+        });
+
+        $('#ticketPurchases').on('click', '.show-bs-modal', function (event) {
+            var id = $(this).data("id");
+            var modal = $("#modal-default");
+            modal.find('.modal-body p').text('Are you sure you want to delete this record?');
+            $("#deleteId").val(id);
+            $("#deleteForm").attr("action", "/Customer/Ticket/Delete");
+            modal.modal('show');
+        });
+        $("#deleteButton").click(function () {
+            $("#deleteForm").submit();
+        });
+    });
+</script>
+}
